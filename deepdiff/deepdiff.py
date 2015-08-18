@@ -40,7 +40,10 @@ class DeepDiff(dict):
     t2 : dictionary, list, string or almost any python object that has __dict__ or __slots__
         The second item is to be compared to the first one
 
-    ignore_order : Boolean, defalt=False igonres orders and duplicates for iterables if it they have hashable items
+    ignore_order : Boolean, defalt=False ignores orders and duplicates for iterables if it they have hashable items
+
+    ignore_keys  : list or string with comma () -- to ignore any particular
+                   dictionary keys from comparison.
 
     **Returns**
 
@@ -113,8 +116,8 @@ class DeepDiff(dict):
         >>>
         >>> print (ddiff['values_changed'][0])
         root[4]['b']:
-        --- 
-        +++ 
+        ---
+        +++
         @@ -1,5 +1,4 @@
         -world!
         -Goodbye!
@@ -197,9 +200,15 @@ class DeepDiff(dict):
 
     """
 
-    def __init__(self, t1, t2, ignore_order=False):
+    def __init__(self, t1, t2, ignore_order=False, ignore_keys=''):
 
         self.ignore_order = ignore_order
+        self.ignore_keys = []
+
+        if isinstance(ignore_keys, str):
+            self.ignore_keys = [_k.strip() for _k in ignore_keys.split(',') if _k]
+        elif isinstance(ignore_keys, list):
+            self.ignore_keys = ignore_keys
 
         self.update({"type_changes": [], "dic_item_added": [], "dic_item_removed": [],
                      "values_changed": [], "unprocessed": [], "iterable_item_added": [], "iterable_item_removed": [],
@@ -254,6 +263,9 @@ class DeepDiff(dict):
         t1_keys, t2_keys = [
             set(d.keys()) for d in (t1, t2)
         ]
+        # remove ignore_keys out of the equations
+        t1_keys = t1_keys - set(self.ignore_keys)
+        t2_keys = t2_keys - set(self.ignore_keys)
 
         t_keys_intersect = t2_keys.intersection(t1_keys)
 

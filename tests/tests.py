@@ -28,6 +28,16 @@ class DeepDiffTestCase(unittest.TestCase):
         t2 = {1: 1, 2: 4, 3: 3}
         self.assertEqual(DeepDiff(t1, t2), {'values_changed': ['root[2]: 2 ===> 4']})
 
+    def test_value_change_w_ignore_keys(self):
+        t1 = {1: 1, 2: 2, 3: 3}
+        t2 = {1: 1, 2: 4, 3: 3}
+        self.assertEqual(DeepDiff(t1, t2, ignore_keys='2'), {'values_changed': ['root[2]: 2 ===> 4']})
+        self.assertEqual(DeepDiff(t1, t2, ignore_keys=[2, ]), {})
+        t1 = {1: 1, '2': 2, 3: {"a": "hello", "b": "world"}}
+        t2 = {1: 1, '2': 4, 3: {"a": "hello2", "b": "world"}}
+        self.assertEqual(DeepDiff(t1, t2, ignore_keys='2,a'), {})
+        self.assertEqual(DeepDiff(t1, t2, **{'ignore_keys': ['a', '2']}), {})
+
     def test_item_added_and_removed(self):
         t1 = {1: 1, 2: 2, 3: 3, 4: 4}
         t2 = {1: 1, 2: 4, 3: 3, 5: 5, 6: 6}

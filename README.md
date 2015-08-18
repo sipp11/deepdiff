@@ -54,6 +54,16 @@ int, string, dictionary, list, tuple, set, frozenset, OrderedDict, NamedTuple an
 {'values_changed': ['root[2]: 2 ===> 4']}
 ```
 
+### Ignore some particular dictionary values change
+
+```python
+>>> t1 = {1: 1, '2': 2, 3: {"a": "hello", "b": "world"}}
+>>> t2 = {1: 1, '2': 4, 3: {"a": "hi", "b": "world"}}
+>>> ddiff = DeepDiff(t1, t2, ignore_keys='2,a')
+>>> print (ddiff)
+{}
+```
+
 ### Item added and/or removed
 
 ```python
